@@ -112,8 +112,9 @@ namespace giderosman
             //search android manifest
             string[] ampath = Directory.GetFiles(projectPath, "AndroidManifest.xml", SearchOption.AllDirectories);
             doc.Load(ampath[0]);
+            string strNamespace = "http://schemas.android.com/apk/res/android";
             XmlNamespaceManager nsmgr = new XmlNamespaceManager(doc.NameTable);
-            string strNamespace = doc.DocumentElement.NamespaceURI;
+            //Console.WriteLine("aaa : " + doc.DocumentElement.NamespaceURI);
             nsmgr.AddNamespace("android", strNamespace);
 
             //set versionCode and versionName 
@@ -132,17 +133,15 @@ namespace giderosman
             var checkBilling = doc.SelectSingleNode("//uses-permission[@android:name='com.android.vending.BILLING']", nsmgr);            
             if (checkBilling == null)
             {
-                var billingNode = doc.CreateNode(XmlNodeType.Element, "uses-permission", strNamespace);
-                XmlAttribute billingNameAttr = doc.CreateAttribute("android:name");
-                billingNameAttr.Value = "com.android.vending.BILLING";
-                billingNode.Attributes.Append(billingNameAttr);
+                var billingNode = doc.CreateElement("uses-permission");
+                billingNode.SetAttribute("name", strNamespace, "com.android.vending.BILLING");                            
                 doc.SelectSingleNode("//manifest").InsertAfter(billingNode, doc.SelectSingleNode("//uses-sdk"));
             }                       
 
             //set allowBackup to false
-            var allowBackupAttr = doc.CreateAttribute("android:allowBackup");
+            var allowBackupAttr = doc.CreateAttribute("android","allowBackup", strNamespace);
             allowBackupAttr.Value = "false";
-            var node = doc.SelectSingleNode("//application").Attributes.Append(allowBackupAttr);
+            doc.SelectSingleNode("//application").Attributes.Append(allowBackupAttr);
 
             doc.Save(ampath[0]);
         }
@@ -176,8 +175,8 @@ namespace giderosman
         {            
             string gdrexportPath = @"C:\Program Files (x86)\Gideros\Tools\gdrexport.exe";
             string gprojPath = @"C:\Users\Asus\Desktop\Elemental Clash\EC - 2\trunk\Project\ElementalClash\ElementalClash.gproj";
-            string versionCode = "5";
-            string versionName = "1.0.4";
+            string versionCode = "6";
+            string versionName = "1.0.5";
             string iconPath = @"C:\Users\Asus\Desktop\Elemental Clash\icons";
                               
             string origPath = Path.GetFullPath(".\\orig");
@@ -187,7 +186,7 @@ namespace giderosman
             Export(gdrexportPath, gprojPath, origPath);            
             EditAndroidManifest(origPath, versionCode, versionName);
             ReplaceIcons(origPath, iconPath);
-            Separate(origPath, ".");
+            //Separate(origPath, ".");
 
             Console.WriteLine("DONE! press enter to exit");
 #if DEBUG
