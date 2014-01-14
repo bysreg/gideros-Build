@@ -12,7 +12,7 @@ namespace giderosman
     class Program
     {
 
-        static void Export(string gdrexportPath, string gprojPath, string outputPath)
+        static void Export(string gdrexportPath, string gprojPath, string outputPath, string packageName)
         {
             Console.WriteLine("Exporting ... ");
 
@@ -23,7 +23,7 @@ namespace giderosman
             ProcessStartInfo startInfo = new ProcessStartInfo();
             startInfo.CreateNoWindow = true;
             startInfo.FileName = gdrexportPath;
-            startInfo.Arguments = "-platform android -package \"com.orgcomgames.elementalclash\" -encrypt \"" + gprojPath + "\" \"" + outputPath + "\"";
+            startInfo.Arguments = "-platform android -package \""+ packageName +"\" -encrypt \"" + gprojPath + "\" \"" + outputPath + "\"";
             Console.WriteLine(startInfo.Arguments);
             int exitCode;
             using (Process proc = Process.Start(startInfo))
@@ -213,14 +213,15 @@ namespace giderosman
         }
 
         static void Main(string[] args)
-        {            
+        {
+            string packageName = "com.orgcomgames.elementalclash";
             string gdrexportPath = @"C:\Program Files (x86)\Gideros\Tools\gdrexport.exe";
             string gprojPath = @"C:\Users\Asus\Desktop\Elemental Clash\EC - 2\trunk\Project\ElementalClash\ElementalClash.gproj";
             string versionCode = "6";
             string versionName = "1.0.5";
             string iconPath = @"C:\Users\Asus\Desktop\Elemental Clash\icons";
             string buildBatPath = @"C:\Users\Asus\Desktop\Elemental Clash\build.bat";
-            string projectName = "ElementalClash"; // harus sesuai dengan filename gproj
+            string projectName = "ElementalClash"; // must be equal to filename gproj
             string keystorePath = @"C:\Users\Asus\Dropbox\Elemental Clash\ec_keystore";
             string passKeyStorePath = @"C:\Users\Asus\Desktop\Elemental Clash\keystore_pass.txt";
             string keystoreAlias = "elemental_clash";
@@ -229,7 +230,7 @@ namespace giderosman
 
             Console.WriteLine("giderosman");
 
-            Export(gdrexportPath, gprojPath, origPath);            
+            Export(gdrexportPath, gprojPath, origPath, packageName);            
             EditAndroidManifest(origPath, versionCode, versionName);
             ReplaceIcons(origPath, iconPath);
             //Separate(origPath, ".");
