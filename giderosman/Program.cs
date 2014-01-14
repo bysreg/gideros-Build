@@ -171,6 +171,47 @@ namespace giderosman
             File.Copy(Path.Combine(iconPath, "xxhdpi", "icon.png"), Path.Combine(xxhdpiFolderPath, "icon.png"), true);            
         }
 
+        static void BuildApk(string projectPath, string batFilePath, string projectName, string keystorePath, string passKeystorePath, string keystoreAlias)
+        {
+            int exitCode = 0;            
+            string unsignedApkPath = Path.Combine(projectPath, "bin", projectName + "-release-unsigned.apk");
+            string signedApkPath = Path.Combine(projectPath, "bin", projectName + "-release-signed.apk");
+            string signedAlignedApkPath = Path.Combine(projectPath, "bin", projectName + "-release-signed-aligned.apk");
+            string antBuildPath = Path.Combine(projectPath, "build.xml");
+
+            //copy gideros.jar(gak perlu overwrite)
+            if(!File.Exists(Path.Combine(projectPath, "libs", "gideros.jar")))
+                File.Copy(Path.Combine(projectPath, "gideros.jar"), Path.Combine(projectPath, "libs", "gideros.jar"));
+
+            Console.WriteLine("Building release version apk ... ");            
+
+            exitCode = RunProcess("android", "update project -n \"" + projectName + "\"" + " -p \"" + projectPath + "\"");            
+            Console.WriteLine("android update project finish : " + exitCode);
+            exitCode = RunProcess("CMD.exe", "/C ant -buildfile \"" + antBuildPath + "\" release");
+            Console.WriteLine("ant release finish : " + exitCode);
+            exitCode = RunProcess("CMD.exe", "/C jarsigner -sigalg SHA1withRSA -digestalg SHA1 -keystore \"" + keystorePath + "\" -signedjar \"" + signedApkPath + "\" \"" + unsignedApkPath + "\" " + keystoreAlias + " < " + "\"" + passKeystorePath+"\"");
+            Console.WriteLine("signing finish : " + exitCode);
+            exitCode = RunProcess("zipalign", "-f 4 \"" + signedApkPath + "\" \"" + signedAlignedApkPath + "\"");
+            Console.WriteLine("aligning finish : " + exitCode);            
+        }
+
+        static int RunProcess(string programPath, string arguments)
+        {
+            ProcessStartInfo startInfo = new ProcessStartInfo();
+            startInfo.CreateNoWindow = true;
+            startInfo.FileName = programPath;
+            startInfo.Arguments = arguments;            
+            Console.WriteLine(programPath + " " + startInfo.Arguments);
+            int exitCode;
+
+            Process process = Process.Start(startInfo);            
+      
+            process.WaitForExit();
+            exitCode = process.ExitCode;
+            process.Dispose();
+            return exitCode;
+        }
+
         static void Main(string[] args)
         {            
             string gdrexportPath = @"C:\Program Files (x86)\Gideros\Tools\gdrexport.exe";
@@ -178,6 +219,11 @@ namespace giderosman
             string versionCode = "6";
             string versionName = "1.0.5";
             string iconPath = @"C:\Users\Asus\Desktop\Elemental Clash\icons";
+            string buildBatPath = @"C:\Users\Asus\Desktop\Elemental Clash\build.bat";
+            string projectName = "ElementalClash"; // harus sesuai dengan filename gproj
+            string keystorePath = @"C:\Users\Asus\Dropbox\Elemental Clash\ec_keystore";
+            string passKeyStorePath = @"C:\Users\Asus\Desktop\Elemental Clash\keystore_pass.txt";
+            string keystoreAlias = "elemental_clash";
                               
             string origPath = Path.GetFullPath(".\\orig");
 
@@ -187,6 +233,7 @@ namespace giderosman
             EditAndroidManifest(origPath, versionCode, versionName);
             ReplaceIcons(origPath, iconPath);
             //Separate(origPath, ".");
+            BuildApk(Path.Combine(origPath, projectName), buildBatPath, projectName, keystorePath, passKeyStorePath, keystoreAlias);
 
             Console.WriteLine("DONE! press enter to exit");
 #if DEBUG
