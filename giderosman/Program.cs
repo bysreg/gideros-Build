@@ -113,8 +113,7 @@ namespace giderosman
             string[] ampath = Directory.GetFiles(projectPath, "AndroidManifest.xml", SearchOption.AllDirectories);
             doc.Load(ampath[0]);
             string strNamespace = "http://schemas.android.com/apk/res/android";
-            XmlNamespaceManager nsmgr = new XmlNamespaceManager(doc.NameTable);
-            //Console.WriteLine("aaa : " + doc.DocumentElement.NamespaceURI);
+            XmlNamespaceManager nsmgr = new XmlNamespaceManager(doc.NameTable);            
             nsmgr.AddNamespace("android", strNamespace);
 
             //set versionCode and versionName 
@@ -217,8 +216,8 @@ namespace giderosman
             string packageName = "com.orgcomgames.elementalclash";
             string gdrexportPath = @"C:\Program Files (x86)\Gideros\Tools\gdrexport.exe";
             string gprojPath = @"C:\Users\Asus\Desktop\Elemental Clash\EC - 2\trunk\Project\ElementalClash\ElementalClash.gproj";
-            string versionCode = "6";
-            string versionName = "1.0.5";
+            string versionCode = "11";
+            string versionName = "1.0.10";
             string iconPath = @"C:\Users\Asus\Desktop\Elemental Clash\icons";
             string buildBatPath = @"C:\Users\Asus\Desktop\Elemental Clash\build.bat";
             string projectName = "ElementalClash"; // must be equal to filename gproj
